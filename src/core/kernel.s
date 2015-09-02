@@ -23,30 +23,32 @@
 ##################################
 
 stack_bottom:
-.skip 1024
+    .skip 4
 stack_top:
 
 ##################
     .section .text
 ##################
 
+.macro vga_print char
+    movb $0x0F, (0xB8001+\@*2)
+    movb \char, (0xB8000+\@*2)
+.endm
+
 .global _start
 .type _start, @function
 _start:
+    # set up stack
     movl $stack_top, %esp
-    movw $0x0F48, (0xB8000)
-    movw $0x0F65, (0xB8002)
-    movw $0x0F6C, (0xB8004)
-    movw $0x0F6C, (0xB8006)
-    movw $0x0F6F, (0xB8008)
-    movw $0x0F2C, (0xB800A)
-    movw $0x0F20, (0xB800C)
-    movw $0x0F57, (0xB800E)
-    movw $0x0F6F, (0xB8010)
-    movw $0x0F72, (0xB8012)
-    movw $0x0F6C, (0xB8014)
-    movw $0x0F64, (0xB8016)
-    movw $0x0F21, (0xB8018)
+    # set up GDT
+    cli
+    call _build_gdt
+    sti
+    vga_print $'Z
+    vga_print $'e
+    vga_print $'t
+    vga_print $'O
+    vga_print $'S
 
 .global _hang
 .type _hang, @function
