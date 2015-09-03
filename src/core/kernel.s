@@ -3,6 +3,15 @@
 #
 # core/kernel.s
 
+############
+    # macros
+############
+
+.macro vga_print char
+    movb $0x0F, (0xB8001+\@*2)
+    movb \char, (0xB8000+\@*2)
+.endm
+
 #######################
     .section .multiboot
 #######################
@@ -30,11 +39,6 @@ stack_top:
     .section .text
 ##################
 
-.macro vga_print char
-    movb $0x0F, (0xB8001+\@*2)
-    movb \char, (0xB8000+\@*2)
-.endm
-
 .global _start
 .type _start, @function
 _start:
@@ -51,7 +55,6 @@ _start:
     vga_print $'S
 
 .global _hang
-.type _hang, @function
 _hang:
     cli
     hlt
